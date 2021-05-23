@@ -13,20 +13,22 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Actor(nn.Module):
-	def __init__(self, state_dim, action_dim, max_action):
+	def __init__(self, state_dim, action_dim, min_action, max_action):
 		super(Actor, self).__init__()
 
 		self.l1 = nn.Linear(state_dim, 400)
 		self.l2 = nn.Linear(400, 300)
 		self.l3 = nn.Linear(300, action_dim)
 		
-		self.max_action = max_action
-
+		assert min_action.size == action_dim and max_action.size == action_dim
+		assert np.all(max_action > min_action)
+		self.mid_action = (min_action + max_action) / 2
+		self.range_action = (max_action - min_action) / 2
 	
 	def forward(self, state):
 		a = F.relu(self.l1(state))
 		a = F.relu(self.l2(a))
-		return self.max_action * torch.tanh(self.l3(a))
+		return self.mid_action + self.range_action * torch.tanh(self.l3(a))
 
 
 class Critic(nn.Module):
@@ -45,8 +47,8 @@ class Critic(nn.Module):
 
 
 class DDPG(object):
-	def __init__(self, state_dim, action_dim, max_action, discount=0.99, tau=0.001):
-		self.actor = Actor(state_dim, action_dim, max_action).to(device)
+	def __init__(self, state_dim, action_dim, min_action, max_action, discount=0.99, tau=0.001):
+		self.actor = Actor(state_dim, action_dim, min_action, max_action).to(device)
 		self.actor_target = copy.deepcopy(self.actor)
 		self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=1e-4)
 
