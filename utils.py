@@ -71,7 +71,7 @@ class NpyDataLoader(object):
             while array_idx + self.batch_size < X.shape[0]:
                 ret = X[array_idx:array_idx+self.batch_size, :]
                 array_idx += self.batch_size
-                yield ret
+                yield torch.from_numpy(ret)
             # not enough data to yield
             ret = X[array_idx:, :]
             file_idx += 1
@@ -79,9 +79,9 @@ class NpyDataLoader(object):
                 X = np.load(os.path.join(self.file_path, self.file_list[file_idx]))
                 array_idx = self.batch_size - ret.shape[0]
                 ret = np.concatenate([ret, X[:array_idx, :]], axis=0)
-                yield ret
+                yield torch.from_numpy(ret)
             else:
-                return ret
+                return torch.from_numpy(ret)
       
 	
         
