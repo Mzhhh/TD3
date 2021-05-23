@@ -55,7 +55,7 @@ class Actor(nn.Module):
     def forward(self, state):
         a = self.encoder(state)
         a = self.linear(a)
-        return self.mid_action + self.range_action * torch.tanh(self.l3(a))
+        return self.mid_action + self.range_action * torch.tanh(a)
 
 
 class Critic(nn.Module):
@@ -102,14 +102,16 @@ class DDPG(object):
 
 
     def select_action(self, state):
-        state = torch.FloatTensor(state.reshape(1, -1)).to(device)
+        state = torch.FloatTensor(state).to(device)
         return self.actor(state).cpu().data.numpy().flatten()
 
 
     def train(self, replay_buffer, batch_size=64):
         # Sample replay buffer 
         state, action, next_state, reward, not_done = replay_buffer.sample(batch_size)
-
+        state = state.view(-1, 3, 96, 96)
+        next_state = next_state.view(-1, 3, 96, 96)
+        
         # Compute the target Q value
         target_Q = self.critic_target(next_state, self.actor_target(next_state))
         target_Q = reward + (not_done * self.discount * target_Q).detach()
