@@ -22,8 +22,8 @@ class Actor(nn.Module):
 		
 		assert min_action.size == action_dim and max_action.size == action_dim
 		assert np.all(max_action > min_action)
-		self.mid_action = (min_action + max_action) / 2
-		self.range_action = (max_action - min_action) / 2
+		self.mid_action = torch.from_numpy(((min_action+max_action)/2).copy())
+		self.range_action = torch.from_numpy(((max_action-min_action)/2).copy())
 	
 	def forward(self, state):
 		a = F.relu(self.l1(state))
