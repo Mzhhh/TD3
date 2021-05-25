@@ -136,7 +136,7 @@ class DDPG(object):
 		# Compute actor loss
 		actor_loss = -self.critic(state, self.actor(state)).mean()
 		
-		return actor_loss, critic_loss
+		return current_Q, actor_loss, critic_loss
   
 	
 	def clear_gradient(self):
