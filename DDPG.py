@@ -116,4 +116,43 @@ class DDPG(object):
 		self.actor.load_state_dict(torch.load(filename + "_actor"))
 		self.actor_optimizer.load_state_dict(torch.load(filename + "_actor_optimizer"))
 		self.actor_target = copy.deepcopy(self.actor)
+  
+	
+	def batch_loss(self, buffer, batch_idx):
+
+		# Sample replay buffer 
+		state, action, next_state, reward, not_done = buffer.get_batch(batch_idx)
+	
+		# Compute the target Q value
+		target_Q = self.critic_target(next_state, self.actor_target(next_state))
+		target_Q = reward + (not_done * self.discount * target_Q).detach()
+
+		# Get current Q estimate
+		current_Q = self.critic(state, action)
+
+		# Compute critic loss
+		critic_loss = F.mse_loss(current_Q, target_Q)
+
+		# Compute actor loss
+		actor_loss = -self.critic(state, self.actor(state)).mean()
 		
+		return actor_loss, critic_loss
+  
+	
+	def clear_gradient(self):
+		self.actor_optimizer.zero_grad()
+		self.critic_optimizer.zero_grad()
+  
+  
+	def update_weights(self):
+     
+		self.actor_optimizer.step()
+		self.critic_optimizer.step()
+		
+		# Update the frozen target models
+		for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
+			target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
+
+		for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
+			target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
+  
