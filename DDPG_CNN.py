@@ -161,25 +161,39 @@ class DDPG(object):
 		self.actor_target = copy.deepcopy(self.actor)
 		
 	
-	def batch_loss(self, buffer, batch_idx):
+	def critic_loss(self, batch_data):
 
 		# Sample replay buffer 
-		state, action, next_state, reward, not_done = buffer.get_batch(batch_idx)
-	
+		state, action, next_state, reward, not_done = batch_data
 		# Compute the target Q value
 		target_Q = self.critic_target(next_state, self.actor_target(next_state))
 		target_Q = reward + (not_done * self.discount * target_Q).detach()
+		# Get current Q estimate
+		current_Q = self.critic(state, action)
+		# Compute critic loss
+		critic_loss = F.mse_loss(current_Q, target_Q)
+		
+		return critic_loss
 
+
+	def actor_loss(self, batch_data):
+
+		# Sample replay buffer 
+		state, action, next_state, reward, not_done = batch_data
+		# Compute actor loss
+		actor_loss = -self.critic(state, self.actor(state)).mean()
+
+		return actor_loss
+
+
+	def Q_value(self, batch_data):
+		
+		# Sample replay buffer 
+		state, action, next_state, reward, not_done = batch_data
 		# Get current Q estimate
 		current_Q = self.critic(state, action)
 
-		# Compute critic loss
-		critic_loss = F.mse_loss(current_Q, target_Q)
-
-		# Compute actor loss
-		actor_loss = -self.critic(state, self.actor(state)).mean()
-		
-		return current_Q, actor_loss, critic_loss
+		return current_Q
   
 	
 	def clear_gradient(self):
@@ -188,10 +202,7 @@ class DDPG(object):
   
   
 	def update_weights(self):
-	 
-		self.actor_optimizer.step()
-		self.critic_optimizer.step()
-		
+	
 		# Update the frozen target models
 		for param, target_param in zip(self.critic.parameters(), self.critic_target.parameters()):
 			target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
