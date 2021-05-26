@@ -117,7 +117,7 @@ class DDPG(object):
 		self.actor_optimizer.load_state_dict(torch.load(filename + "_actor_optimizer"))
 		self.actor_target = copy.deepcopy(self.actor)
   
-	
+  
 	def batch_loss(self, buffer, batch_idx):
 
 		# Sample replay buffer 
@@ -145,7 +145,7 @@ class DDPG(object):
   
   
 	def update_weights(self):
-     
+	 
 		self.actor_optimizer.step()
 		self.critic_optimizer.step()
 		

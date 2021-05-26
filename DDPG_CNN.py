@@ -161,7 +161,7 @@ class DDPG(object):
 		self.actor_target = copy.deepcopy(self.actor)
 		
 	
- 	def batch_loss(self, buffer, batch_idx):
+	def batch_loss(self, buffer, batch_idx):
 
 		# Sample replay buffer 
 		state, action, next_state, reward, not_done = buffer.get_batch(batch_idx)
@@ -188,7 +188,7 @@ class DDPG(object):
   
   
 	def update_weights(self):
-     
+	 
 		self.actor_optimizer.step()
 		self.critic_optimizer.step()
 		
