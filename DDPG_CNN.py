@@ -28,14 +28,17 @@ class Actor(nn.Module):
 		super(Actor, self).__init__()
 
 		self.encoder = nn.Sequential(
-			nn.Conv2d(img_channels, 32, kernel_size=4,
-					  stride=2),  # b, 32, 47, 47
+			nn.Conv2d(img_channels, 32, kernel_size=4, stride=2),  # b, 32, 47, 47
+			nn.BatchNorm2d(32),
 			nn.ReLU(),
 			nn.Conv2d(32, 64, kernel_size=4, stride=2),  # b, 64, 22, 22
+			nn.BatchNorm2d(64),
 			nn.ReLU(),
 			nn.Conv2d(64, 128, kernel_size=4, stride=2),  # b, 128, 10, 10
+			nn.BatchNorm2d(128),
 			nn.ReLU(),
 			nn.Conv2d(128, 256, kernel_size=4, stride=2),  # b, 256, 4, 4
+			nn.BatchNorm2d(256),
 			nn.ReLU(),
 			Flatten()  # b, 4096
 		)
@@ -63,14 +66,17 @@ class Critic(nn.Module):
 		super(Critic, self).__init__()
 
 		self.encoder = nn.Sequential(
-			nn.Conv2d(img_channels, 32, kernel_size=4,
-					  stride=2),  # b, 32, 47, 47
+			nn.Conv2d(img_channels, 32, kernel_size=4, stride=2),  # b, 32, 47, 47
+			nn.BatchNorm2d(32),
 			nn.ReLU(),
 			nn.Conv2d(32, 64, kernel_size=4, stride=2),  # b, 64, 22, 22
+			nn.BatchNorm2d(64),
 			nn.ReLU(),
 			nn.Conv2d(64, 128, kernel_size=4, stride=2),  # b, 128, 10, 10
+			nn.BatchNorm2d(128),
 			nn.ReLU(),
 			nn.Conv2d(128, 256, kernel_size=4, stride=2),  # b, 256, 4, 4
+			nn.BatchNorm2d(256),
 			nn.ReLU(),
 			Flatten()  # b, 4096
 		)
