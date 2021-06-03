@@ -31,6 +31,19 @@ class ReplayBuffer(object):
 		self.ptr = (self.ptr + 1) % self.max_size
 		self.size = min(self.size + 1, self.max_size)
 
+
+	def add_vector(self, state, action, next_state, reward, done):
+		# permute: (96, 96, 3) -> (3, 96, 96)
+		self.state[self.ptr] = torch.from_numpy(state).float().to(self.device)
+		self.action[self.ptr] = torch.from_numpy(np.array(action)).float().to(self.device)
+		self.next_state[self.ptr] = torch.from_numpy(next_state).float().to(self.device)
+		self.reward[self.ptr] = torch.tensor(reward, device=self.device)
+		self.not_done[self.ptr] = torch.tensor(1. - done, device=self.device)
+
+		self.ptr = (self.ptr + 1) % self.max_size
+		self.size = min(self.size + 1, self.max_size)
+
+
 	def sample(self, batch_size):
 		ind = np.random.randint(0, self.size, size=batch_size)
 
