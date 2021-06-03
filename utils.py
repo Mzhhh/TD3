@@ -5,25 +5,27 @@ import re
 
 
 class ReplayBuffer(object):
-	def __init__(self, state_dim, action_dim, max_size=int(1e6)):
+
+	def __init__(self, state_dim, action_dim, max_size=int(1e6), device=None):
 		self.max_size = max_size
 		self.ptr = 0
 		self.size = 0
 
-		self.state = np.zeros((max_size, *state_dim))
-		self.action = np.zeros((max_size, action_dim))
-		self.next_state = np.zeros((max_size, *state_dim))
-		self.reward = np.zeros((max_size, 1))
-		self.not_done = np.zeros((max_size, 1))
-		
-		self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+		self.device = device if device is not None else "cpu"
 
+		self.state = torch.zeros((max_size, *state_dim), device=self.device)
+		self.action = torch.zeros((max_size, action_dim), device=self.device)
+		self.next_state = torch.zeros((max_size, *state_dim), device=self.device)
+		self.reward = torch.zeros((max_size, 1), device=self.device)
+		self.not_done = torch.zeros((max_size, 1), device=self.device)
+		
+		
 	def add(self, state, action, next_state, reward, done):
-		self.state[self.ptr] = state
-		self.action[self.ptr] = action
-		self.next_state[self.ptr] = next_state
-		self.reward[self.ptr] = reward
-		self.not_done[self.ptr] = 1. - done
+		self.state[self.ptr] = torch.from_numpy(state).float().to(self.device)
+		self.action[self.ptr] = torch.from_numpy(np.array(action)).float().to(self.device)
+		self.next_state[self.ptr] = torch.from_numpy(next_state).float().to(self.device)
+		self.reward[self.ptr] = torch.tensor(reward, device=self.device)
+		self.not_done[self.ptr] = torch.tensor(1. - done, device=self.device)
 
 		self.ptr = (self.ptr + 1) % self.max_size
 		self.size = min(self.size + 1, self.max_size)
@@ -32,21 +34,21 @@ class ReplayBuffer(object):
 		ind = np.random.randint(0, self.size, size=batch_size)
 
 		return (
-			torch.FloatTensor(self.state[ind]).to(self.device),
-			torch.FloatTensor(self.action[ind]).to(self.device),
-			torch.FloatTensor(self.next_state[ind]).to(self.device),
-			torch.FloatTensor(self.reward[ind]).to(self.device),
-			torch.FloatTensor(self.not_done[ind]).to(self.device)
+			self.state[ind],
+			self.action[ind],
+			self.next_state[ind],
+			self.reward[ind],
+			self.not_done[ind]
 		)
 	
 	def get_batch(self, batch_index):
 
 		return (
-			torch.FloatTensor(self.state[batch_index]).to(self.device),
-			torch.FloatTensor(self.action[batch_index]).to(self.device),
-			torch.FloatTensor(self.next_state[batch_index]).to(self.device),
-			torch.FloatTensor(self.reward[batch_index]).to(self.device),
-			torch.FloatTensor(self.not_done[batch_index]).to(self.device)
+			self.state[batch_index],
+			self.action[batch_index],
+			self.next_state[batch_index],
+			self.reward[batch_index],
+			self.not_done[batch_index]
 		)
 
 
