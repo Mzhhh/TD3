@@ -183,41 +183,41 @@ class DDPG(object):
 
 		if writer and (t+1) % log_freq == 0:
 			with torch.no_grad():
-				log_writer.add_scalar('expertQ_train_raw/critic_loss', critic_loss, t + 1)
-				log_writer.add_scalar('expertQ_train_raw/not_done', not_done.sum(), t + 1)
+				writer.add_scalar('expertQ_train_raw/critic_loss', critic_loss, t + 1)
+				writer.add_scalar('expertQ_train_raw/not_done', not_done.sum(), t + 1)
 
 				# current_Q
-				log_writer.add_scalar('expertQ_train_raw/current_Q/mean', torch.mean(current_Q), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/current_Q/max', current_Q.max(), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/current_Q/min', current_Q.min(), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/current_Q/std', torch.std(current_Q), t + 1)
+				writer.add_scalar('expertQ_train_raw/current_Q/mean', torch.mean(current_Q), t + 1)
+				writer.add_scalar('expertQ_train_raw/current_Q/max', current_Q.max(), t + 1)
+				writer.add_scalar('expertQ_train_raw/current_Q/min', current_Q.min(), t + 1)
+				writer.add_scalar('expertQ_train_raw/current_Q/std', torch.std(current_Q), t + 1)
 
 				# # next_Q
 				# # next_Q = torch.masked_select(next_Q, torch.BoolTensor(states[:, -self.a_dim:]))
-				# log_writer.add_scalar('expertQ_train_raw/next_Q/mean', torch.mean(next_Q), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q/max', next_Q.max(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q/min', next_Q.min(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q/std', torch.std(next_Q), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q/mean', torch.mean(next_Q), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q/max', next_Q.max(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q/min', next_Q.min(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q/std', torch.std(next_Q), t + 1)
 				#
 				# # target_next_Q
 				# # target_next_Q = torch.masked_select(target_next_Q, torch.BoolTensor(next_states[:, -self.a_dim:]))
-				# log_writer.add_scalar('expertQ_train_raw/future_target_Q/mean', torch.mean(target_next_Q), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/future_target_Q/max', target_next_Q.max(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/future_target_Q/min', target_next_Q.min(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/future_target_Q/std', torch.std(target_next_Q), t + 1)
+				# writer.add_scalar('expertQ_train_raw/future_target_Q/mean', torch.mean(target_next_Q), t + 1)
+				# writer.add_scalar('expertQ_train_raw/future_target_Q/max', target_next_Q.max(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/future_target_Q/min', target_next_Q.min(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/future_target_Q/std', torch.std(target_next_Q), t + 1)
 				#
 				# # next_Q_diff
 				# next_Q_diff = torch.max(next_Q, 1)[0] - target_next_Q
-				# log_writer.add_scalar('expertQ_train_raw/next_Q_diff/mean', torch.mean(next_Q_diff), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q_diff/max', next_Q_diff.max(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q_diff/min', next_Q_diff.min(), t + 1)
-				# log_writer.add_scalar('expertQ_train_raw/next_Q_diff/std', torch.std(next_Q_diff), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q_diff/mean', torch.mean(next_Q_diff), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q_diff/max', next_Q_diff.max(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q_diff/min', next_Q_diff.min(), t + 1)
+				# writer.add_scalar('expertQ_train_raw/next_Q_diff/std', torch.std(next_Q_diff), t + 1)
 
 				# expected_Q
-				log_writer.add_scalar('expertQ_train_raw/target_Q/mean', torch.mean(target_Q), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/target_Q/max', target_Q.max(), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/target_Q/min', target_Q.min(), t + 1)
-				log_writer.add_scalar('expertQ_train_raw/target_Q/std', torch.std(target_Q), t + 1)
+				writer.add_scalar('expertQ_train_raw/target_Q/mean', torch.mean(target_Q), t + 1)
+				writer.add_scalar('expertQ_train_raw/target_Q/max', target_Q.max(), t + 1)
+				writer.add_scalar('expertQ_train_raw/target_Q/min', target_Q.min(), t + 1)
+				writer.add_scalar('expertQ_train_raw/target_Q/std', torch.std(target_Q), t + 1)
 		
 		return critic_loss
 
