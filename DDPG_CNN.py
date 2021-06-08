@@ -17,7 +17,7 @@ class Flatten(torch.nn.Module):
 		return x.view(x.size(0), -1)
 
 
-latent_dim = 256
+latent_dim = 1024
 z_dim = 32
 
 log_freq = 100
@@ -30,10 +30,10 @@ class Actor(nn.Module):
 		super(Actor, self).__init__()
 
 		self.encoder = nn.Sequential(
-			nn.Conv2d(img_channels, 32, kernel_size=4, stride=3),
+			nn.Conv2d(img_channels, 32, kernel_size=4, stride=2),
 			nn.BatchNorm2d(32),
 			nn.ReLU(),
-			nn.Conv2d(32, 64, kernel_size=4, stride=3), 
+			nn.Conv2d(32, 64, kernel_size=4, stride=2), 
 			nn.BatchNorm2d(64),
 			nn.ReLU(),
 			nn.Conv2d(64, 128, kernel_size=4, stride=2), 
@@ -68,10 +68,10 @@ class Critic(nn.Module):
 		super(Critic, self).__init__()
 
 		self.encoder = nn.Sequential(
-			nn.Conv2d(img_channels, 32, kernel_size=4, stride=3),  
+			nn.Conv2d(img_channels, 32, kernel_size=4, stride=2),  
 			nn.BatchNorm2d(32),
 			nn.ReLU(),
-			nn.Conv2d(32, 64, kernel_size=4, stride=3), 
+			nn.Conv2d(32, 64, kernel_size=4, stride=2), 
 			nn.BatchNorm2d(64),
 			nn.ReLU(),
 			nn.Conv2d(64, 128, kernel_size=4, stride=2), 
@@ -80,7 +80,7 @@ class Critic(nn.Module):
 			nn.Conv2d(128, 256, kernel_size=4, stride=2),
 			nn.BatchNorm2d(256),
 			nn.ReLU(),
-			Flatten()  # b, 4096
+			Flatten() 
 		)
 		
 		self.linear = nn.Sequential(
@@ -117,8 +117,8 @@ class DDPG(object):
 	def train(self, replay_buffer, batch_size=64):
 		# Sample replay buffer 
 		state, action, next_state, reward, not_done = replay_buffer.sample(batch_size)
-		state = state.view(-1, 3, 96, 96)
-		next_state = next_state.view(-1, 3, 96, 96)
+		state = state.view(-1, 3, 64, 64)
+		next_state = next_state.view(-1, 3, 64, 64)
 		
 		# Compute the target Q value
 		target_Q = self.critic_target(next_state, self.actor_target(next_state))
