@@ -150,6 +150,8 @@ class DDPG(object):
 		for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
 			target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 
+	
+
 
 	def save(self, filename):
 		torch.save(self.critic.state_dict(), filename + "_critic")
@@ -219,7 +221,7 @@ class DDPG(object):
 				writer.add_scalar('expertQ_train_raw/target_Q/min', target_Q.min(), t + 1)
 				writer.add_scalar('expertQ_train_raw/target_Q/std', torch.std(target_Q), t + 1)
 		
-		return critic_loss
+		return critic_loss.data, actor_loss.data
 
 
 	def actor_loss(self, batch_data):
