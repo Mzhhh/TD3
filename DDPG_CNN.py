@@ -150,6 +150,7 @@ class DDPG(object):
 		for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
 			target_param.data.copy_(self.tau * param.data + (1 - self.tau) * target_param.data)
 
+		return critic_loss.data, actor_loss.data
 	
 
 
@@ -219,9 +220,6 @@ class DDPG(object):
 				writer.add_scalar('expertQ_train_raw/target_Q/mean', torch.mean(target_Q), t + 1)
 				writer.add_scalar('expertQ_train_raw/target_Q/max', target_Q.max(), t + 1)
 				writer.add_scalar('expertQ_train_raw/target_Q/min', target_Q.min(), t + 1)
-				writer.add_scalar('expertQ_train_raw/target_Q/std', torch.std(target_Q), t + 1)
-		
-		return critic_loss.data, actor_loss.data
 
 
 	def actor_loss(self, batch_data):
