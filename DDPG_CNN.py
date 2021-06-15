@@ -221,6 +221,8 @@ class DDPG(object):
 				writer.add_scalar('expertQ_train_raw/target_Q/max', target_Q.max(), t + 1)
 				writer.add_scalar('expertQ_train_raw/target_Q/min', target_Q.min(), t + 1)
 
+		return critic_loss
+
 
 	def actor_loss(self, batch_data):
 
